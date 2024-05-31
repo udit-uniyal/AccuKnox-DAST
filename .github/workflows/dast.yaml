@@ -34,12 +34,16 @@ jobs:
 
       - name: Upload ZAP Scan Report
         run: |
-          if [ -f "./scanreport.json" ]; then
+          # Define the path to the scan report within the GitHub workspace
+          REPORT_PATH="${{ github.workspace }}/scanreport.json"
+    
+          # Check if the scan report file exists
+          if [ -f "$REPORT_PATH" ]; then
             echo "scanreport.json found, uploading..."
             curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
               --header "Tenant-Id: 167" \
               --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE2OTk5OTEyLCJqdGkiOiI2M2I2MDE4NzQzOTc0YzFlODRlZWU4NmEzNjkwYzYwMyIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.T_WYn10W9qScmVz0h1-d44zn1O92acWxxOC7PELIfBa_RJZwM02k5TLY1pV7AZ3sSw_uqZKqLEc9qy6jSFUN0-Mc3t8J75WHUJEfMPHydhLYxHEUyIeBBqaeHF-OC5tlgJqm8vfcOhtpRR0lWZTNhGfesrtN_2CeTIlaL5_I0itECZ8af1WcGGYUjpSiQDCoFMhG_6-yctbx2GryzO4raHBMQ4it9hps6RRS0zmC8y9XuGyKojpo5NSQobZEcVpnH0iIeA0WLKpU3YjrSuFHfo-Hj_VJXBWCchAcLejTUYiOJkg9ITO_Ic4FL2c_zOdvtyYsCEjjrAO3FzAot5zb4w" \
-              --form 'file=@"./scanreport.json"'
+              --form "file=@\"$REPORT_PATH\""
           else
             echo "scanreport.json not found, not uploading."
           fi
