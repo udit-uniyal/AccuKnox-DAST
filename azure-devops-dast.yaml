@@ -1,3 +1,5 @@
+name: OWASP ZAP Scanning Workflow
+
 trigger:
   branches:
     include:
@@ -9,13 +11,13 @@ pr:
       - main
 
 jobs:
-  - job: accuknox_cicd
-    displayName: AccuKnox CI/CD
+  - job: zap_scan
+    displayName: OWASP ZAP Scan
     pool:
       vmImage: 'ubuntu-latest'
-      
+
     steps:
-      - task: Checkout@v2
+      - checkout: self
         displayName: 'Checkout code'
 
       - script: |
@@ -24,11 +26,11 @@ jobs:
 
       - script: |
           sudo chmod -R 777 $(Build.SourcesDirectory)
-          echo "TARGET_URL=http://testhtml5.vulnweb.com/" >> $(System.DefaultWorkingDirectory)/env.sh
-        displayName: 'Set Target'
-        
+          echo "TARGET_URL=https://risasdental.com/" >> $(Build.SourcesDirectory)/env.sh
+        displayName: 'Set up Docker Environment'
+
       - script: |
-          source $(System.DefaultWorkingDirectory)/env.sh
+          source $(Build.SourcesDirectory)/env.sh
           docker run --rm -v $(Build.SourcesDirectory):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
             -t $TARGET_URL \
             -r scanreport.html \
@@ -43,9 +45,9 @@ jobs:
         displayName: 'List reports'
 
       - script: |
-            cd $(Build.SourcesDirectory)
-            curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
-              --header "Tenant-Id: 167" \
-              --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NzU5NzkxLCJqdGkiOiI2MWYxYjQ0NjhkZDM0MTMzYjdkM2Q1MTUwMTM5ZWFjZiIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Tv4TRMjPvuNC6uTaWg9JSpnTf7uSsqMJubd_qh9uyr3h_CQE9oAuYc0_k7J8WAdLNos4rwH4s2ng2yHU74MQ-3auJ_hRc4fUPcNvb6HiSBkmLexufn4I2yxHkvOS_uevrViI0n_uY1fgMgyKTwy_HlTMrS6RDQATNFjaV1ZsIOa5fDcAtYMBj3S_IFGoEm-Nv6zO_03JIwDy7eR5crd7O55C-76-XAeMsi4ZkCHKkr6im-64edpariylaPdl5jqlStqaz1iScKC6RPO3CJ7iGFCZ2PVYFiacVX-M7hXOeakQv0X9pC1fs9anmpCa3AYM31FZe4hfj41YuURZGkzuNA" \
-              --form "file=@\"scanreport.json\""
+          cd $(Build.SourcesDirectory)
+          curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
+            --header "Tenant-Id: 167" \
+            --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NzU5NzkxLCJqdGkiOiI2MWYxYjQ0NjhkZDM0MTMzYjdkM2Q1MTUwMTM5ZWFjZiIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Tv4TRMjPvuNC6uTaWg9JSpnTf7uSsqMJubd_qh9uyr3h_CQE9oAuYc0_k7J8WAdLNos4rwH4s2ng2yHU74MQ-3auJ_hRc4fUPcNvb6HiSBkmLexufn4I2yxHkvOS_uevrViI0n_uY1fgMgyKTwy_HlTMrS6RDQATNFjaV1ZsIOa5fDcAtYMBj3S_IFGoEm-Nv6zO_03JIwDy7eR5crd7O55C-76-XAeMsi4ZkCHKkr6im-64edpariylaPdl5jqlStqaz1iScKC6RPO3CJ7iGFCZ2PVYFiacVX-M7hXOeakQv0X9pC1fs9anmpCa3AYM31FZe4hfj41YuURZGkzuNA" \
+            --form "file=@\"scanreport.json\""
         displayName: 'Upload ZAP Scan Report'
