@@ -9,9 +9,11 @@ pr:
       - main
 
 jobs:
-  zap_scan:
+  - job: accuknox_cicd
+    displayName: AccuKnox CI/CD
     pool:
-      name: 'ubuntu'
+      vmImage: 'ubuntu-latest'
+      
     steps:
       - task: Checkout@v2
         displayName: 'Checkout code'
