@@ -24,12 +24,13 @@ jobs:
 
       - script: |
           sudo chmod -R 777 $(Build.SourcesDirectory)
-          echo "TARGET_URL=http://testhtml5.vulnweb.com/" >> $GITHUB_ENV
+          echo "TARGET_URL=http://testhtml5.vulnweb.com/" >> $(System.DefaultWorkingDirectory)/env.sh
         displayName: 'Set Target'
-
+        
       - script: |
+          source $(System.DefaultWorkingDirectory)/env.sh
           docker run --rm -v $(Build.SourcesDirectory):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-            -t $(TARGET_URL) \
+            -t $TARGET_URL \
             -r scanreport.html \
             -x scanreport.xml \
             -J scanreport.json \
