@@ -11,7 +11,7 @@ pr:
 jobs:
   zap_scan:
     pool:
-      vmImage: 'ubuntu-latest'
+      name: 'ubuntu'
     steps:
       - task: Checkout@v2
         displayName: 'Checkout code'
