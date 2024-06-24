@@ -1,0 +1,48 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+jobs:
+  zap_scan:
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - task: Checkout@v2
+        displayName: 'Checkout code'
+
+      - script: |
+          sudo chmod -R 777 $(System.DefaultWorkingDirectory)
+        displayName: 'Set full permissions'
+
+      - script: |
+          sudo chmod -R 777 $(Build.SourcesDirectory)
+          echo "TARGET_URL=https://risasdental.com/" >> $GITHUB_ENV
+        displayName: 'Set up Docker Environment'
+
+      - script: |
+          docker run --rm -v $(Build.SourcesDirectory):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
+            -t $(TARGET_URL) \
+            -r scanreport.html \
+            -x scanreport.xml \
+            -J scanreport.json \
+            -I
+        displayName: 'OWASP ZAP Scan'
+
+      - script: |
+          echo "Listing generated reports..."
+          ls -l $(Build.SourcesDirectory)
+        displayName: 'List reports'
+
+      - script: |
+            cd $(Build.SourcesDirectory)
+            curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
+              --header "Tenant-Id: 167" \
+              --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NzU5NzkxLCJqdGkiOiI2MWYxYjQ0NjhkZDM0MTMzYjdkM2Q1MTUwMTM5ZWFjZiIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Tv4TRMjPvuNC6uTaWg9JSpnTf7uSsqMJubd_qh9uyr3h_CQE9oAuYc0_k7J8WAdLNos4rwH4s2ng2yHU74MQ-3auJ_hRc4fUPcNvb6HiSBkmLexufn4I2yxHkvOS_uevrViI0n_uY1fgMgyKTwy_HlTMrS6RDQATNFjaV1ZsIOa5fDcAtYMBj3S_IFGoEm-Nv6zO_03JIwDy7eR5crd7O55C-76-XAeMsi4ZkCHKkr6im-64edpariylaPdl5jqlStqaz1iScKC6RPO3CJ7iGFCZ2PVYFiacVX-M7hXOeakQv0X9pC1fs9anmpCa3AYM31FZe4hfj41YuURZGkzuNA" \
+              --form "file=@\"scanreport.json\""
+        displayName: 'Upload ZAP Scan Report'
