@@ -22,8 +22,8 @@ jobs:
 
       - script: |
           sudo chmod -R 777 $(Build.SourcesDirectory)
-          echo "TARGET_URL=https://risasdental.com/" >> $GITHUB_ENV
-        displayName: 'Set up Docker Environment'
+          echo "TARGET_URL=http://testhtml5.vulnweb.com/" >> $GITHUB_ENV
+        displayName: 'Set Target'
 
       - script: |
           docker run --rm -v $(Build.SourcesDirectory):/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
