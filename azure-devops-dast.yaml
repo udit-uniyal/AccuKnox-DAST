@@ -14,7 +14,7 @@ jobs:
   - job: zap_scan
     displayName: OWASP ZAP Scan
     pool:
-      vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu'
       # vmImage: 'ubuntu-latest'
 
     steps:
