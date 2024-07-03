@@ -12,10 +12,11 @@ pr:
 
 jobs:
   - job: zap_scan
-    displayName: OWASP ZAP Scan
+    displayName: 'OWASP ZAP Scan'
     pool:
-      vmImage: 'ubuntu'
-      # vmImage: 'ubuntu-latest'
+      vmImage: 'ubuntu-latest'
+    variables:
+      - group: AccuKnoxSecrets 
 
     steps:
       - checkout: self
@@ -23,12 +24,12 @@ jobs:
 
       - script: |
           sudo chmod -R 777 $(System.DefaultWorkingDirectory)
-        displayName: 'Set full permissions'
+        displayName: 'Set full permissions on working directory'
 
       - script: |
           sudo chmod -R 777 $(Build.SourcesDirectory)
-          echo "TARGET_URL=${{ secrets.TARGET_URL }}" >> $(Build.SourcesDirectory)/env.sh
-        displayName: 'Set up Docker Environment'
+          echo "TARGET_URL=$(TARGET_URL)" >> $(Build.SourcesDirectory)/env.sh
+        displayName: 'Set up Docker Environment and Environment Variables'
 
       - script: |
           source $(Build.SourcesDirectory)/env.sh
@@ -38,17 +39,26 @@ jobs:
             -x scanreport.xml \
             -J scanreport.json \
             -I
-        displayName: 'OWASP ZAP Scan'
+        displayName: 'Run OWASP ZAP Scan'
 
       - script: |
           echo "Listing generated reports..."
           ls -l $(Build.SourcesDirectory)
         displayName: 'List reports'
 
+      - task: DownloadSecureFile@1
+        name: ak_token
+        inputs:
+          secureFile: 'AK_TOK'
+        displayName: 'Download AccuKnox Token'
+
       - script: |
-          cd $(Build.SourcesDirectory)
-          curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
-            --header "Tenant-Id: 167" \
-            --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NzU5NzkxLCJqdGkiOiI2MWYxYjQ0NjhkZDM0MTMzYjdkM2Q1MTUwMTM5ZWFjZiIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Tv4TRMjPvuNC6uTaWg9JSpnTf7uSsqMJubd_qh9uyr3h_CQE9oAuYc0_k7J8WAdLNos4rwH4s2ng2yHU74MQ-3auJ_hRc4fUPcNvb6HiSBkmLexufn4I2yxHkvOS_uevrViI0n_uY1fgMgyKTwy_HlTMrS6RDQATNFjaV1ZsIOa5fDcAtYMBj3S_IFGoEm-Nv6zO_03JIwDy7eR5crd7O55C-76-XAeMsi4ZkCHKkr6im-64edpariylaPdl5jqlStqaz1iScKC6RPO3CJ7iGFCZ2PVYFiacVX-M7hXOeakQv0X9pC1fs9anmpCa3AYM31FZe4hfj41YuURZGkzuNA" \
-            --form "file=@\"scanreport.json\""
+          cat $(ak_token.secureFilePath) | tr '_-' '/+' | base64 -d > $(Build.SourcesDirectory)/decrypted-data.txt
+        displayName: 'Decrypt AccuKnox token'
+
+      - script: |
+          curl --location --request POST "https://$(AK_URL)/api/v1/artifact/?tenant_id=$(TENANT_ID)&data_type=ZAP&save_to_s3=false" \
+            --header "Tenant-Id: $(TENANT_ID)" \
+            --header "Authorization: Bearer $(cat $(Build.SourcesDirectory)/decrypted-data.txt)" \
+            --form "file=@\"$(Build.SourcesDirectory)/scanreport.json\""
         displayName: 'Upload ZAP Scan Report'
