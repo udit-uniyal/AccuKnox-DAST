@@ -26,7 +26,7 @@ jobs:
 
       - script: |
           sudo chmod -R 777 $(Build.SourcesDirectory)
-          echo "TARGET_URL=https://risasdental.com/" >> $(Build.SourcesDirectory)/env.sh
+          echo "TARGET_URL=${{ secrets.TARGET_URL }}" >> $(Build.SourcesDirectory)/env.sh
         displayName: 'Set up Docker Environment'
 
       - script: |
