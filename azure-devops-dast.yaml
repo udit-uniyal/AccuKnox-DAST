@@ -53,7 +53,7 @@ jobs:
         displayName: 'Download AccuKnox Token'
 
       - script: |
-          cat $(token.secureFilePath) | tr '_-' '/+' | base64 -d > $(Build.SourcesDirectory)/decrypted-data.txt
+          cat $(token.secureFilePath) | tr '_-' '/+' | base64 -d > /workspace/decrypted-data.txt
         displayName: 'Decrypt AccuKnox token'
 
       - script: |
