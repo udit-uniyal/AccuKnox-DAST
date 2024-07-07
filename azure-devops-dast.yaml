@@ -16,7 +16,7 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     variables:
-      - group: AccuKnoxSecrets
+      - group: AccuKnoxVariables
 
     steps:
       - checkout: self
