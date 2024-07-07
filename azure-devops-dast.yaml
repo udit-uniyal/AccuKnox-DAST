@@ -47,7 +47,7 @@ jobs:
         displayName: 'List reports'
 
       - task: DownloadSecureFile@1
-        name: token
+        name: TOKEN
         inputs:
           secureFile: 'TOKEN'
         displayName: 'Download AccuKnox Token'
