@@ -47,13 +47,18 @@ jobs:
         displayName: 'List reports'
 
       - task: DownloadSecureFile@1
-        name: TOKEN
+        name: token
         inputs:
           secureFile: 'TOKEN'
         displayName: 'Download AccuKnox Token'
 
       - script: |
-          cat $(token.secureFilePath) | tr '_-' '/+' | base64 -d > $(Build.SourcesDirectory)/decrypted-data.txt
+          echo "Token content:"
+          cat $(token.secureFilePath)
+        displayName: 'Display AccuKnox token'
+
+      - script: |
+          base64 -d $(token.secureFilePath) > $(Build.SourcesDirectory)/decrypted-data.txt || echo "Decoding failed"
         displayName: 'Decrypt AccuKnox token'
 
       - script: |
