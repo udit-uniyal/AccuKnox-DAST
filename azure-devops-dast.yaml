@@ -53,17 +53,8 @@ jobs:
         displayName: 'Download AccuKnox Token'
 
       - script: |
-          echo "Token content:"
-          cat $(token.secureFilePath)
-        displayName: 'Display AccuKnox token'
-
-      - script: |
-          base64 -d $(token.secureFilePath) > $(Build.SourcesDirectory)/decrypted-data.txt || echo "Decoding failed"
-        displayName: 'Decrypt AccuKnox token'
-
-      - script: |
           curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=$(TENANT_ID)&data_type=ZAP&save_to_s3=false" \
             --header "Tenant-Id: $(TENANT_ID)" \
-            --header "Authorization: Bearer $(cat $(Build.SourcesDirectory)/decrypted-data.txt)" \
+            --header "Authorization: Bearer $(cat $(token.secureFilePath))" \
             --form "file=@$(Build.SourcesDirectory)/scanreport.json"
         displayName: 'Upload ZAP Scan Report'
