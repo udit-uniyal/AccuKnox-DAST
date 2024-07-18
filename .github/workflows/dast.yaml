@@ -17,7 +17,7 @@ jobs:
       - name: OWASP ZAP Scan
         run: |
           docker run --rm -v ${{ github.workspace }}:/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-            -t ${{ env.TARGET_URL }} \
+            -t https://www.zaproxy.org/ \
             -r scanreport.html \
             -x scanreport.xml \
             -J scanreport.json \
