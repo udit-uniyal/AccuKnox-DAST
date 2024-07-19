@@ -12,7 +12,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      # Set full permissions for the workspace and potentially broader scop
+
+      - name: Set full permissions
+        run: sudo chmod -R 777 .
+        
+      - name: Set up Docker Environment
+        run: |
+          sudo chmod -R 777 ${{ github.workspace }}
+          echo "TARGET_URL=https://risasdental.com/" >> $GITHUB_ENV
+          
 
       - name: OWASP ZAP Scan
         run: |
