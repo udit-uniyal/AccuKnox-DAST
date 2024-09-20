@@ -25,7 +25,7 @@ jobs:
       - name: OWASP ZAP Scan
         run: |
           docker run --rm -v ${{ github.workspace }}:/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-            -t https://www.zaproxy.org/ \
+            -t http://testphp.vulnweb.com/ \
             -r scanreport.html \
             -x scanreport.xml \
             -J scanreport.json \
@@ -39,7 +39,7 @@ jobs:
       - name: Upload ZAP Scan Report
         run: |
             cd ${GITHUB_WORKSPACE}
-            curl --location --request POST "https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=167&data_type=ZAP&save_to_s3=false" \
-              --header "Tenant-Id: 167" \
-              --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE5NzU5NzkxLCJqdGkiOiI2MWYxYjQ0NjhkZDM0MTMzYjdkM2Q1MTUwMTM5ZWFjZiIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Tv4TRMjPvuNC6uTaWg9JSpnTf7uSsqMJubd_qh9uyr3h_CQE9oAuYc0_k7J8WAdLNos4rwH4s2ng2yHU74MQ-3auJ_hRc4fUPcNvb6HiSBkmLexufn4I2yxHkvOS_uevrViI0n_uY1fgMgyKTwy_HlTMrS6RDQATNFjaV1ZsIOa5fDcAtYMBj3S_IFGoEm-Nv6zO_03JIwDy7eR5crd7O55C-76-XAeMsi4ZkCHKkr6im-64edpariylaPdl5jqlStqaz1iScKC6RPO3CJ7iGFCZ2PVYFiacVX-M7hXOeakQv0X9pC1fs9anmpCa3AYM31FZe4hfj41YuURZGkzuNA" \
+            curl --location --request POST "https://cspm.stage.accuknox.com/api/v1/artifact/?tenant_id=5088&data_type=ZAP&save_to_s3=false" \
+              --header "Tenant-Id: 5088" \
+              --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxODg0OTM3OTY5LCJqdGkiOiI0MDc3YWI5MTdlNTQ0NGEwYTFmNmExZTYzYWM5ZGVjYyIsImlzcyI6ImNzcG0uc3RhZ2UuYWNjdWtub3guY29tIn0.RUAFGIfS8NhZ83SZ-Rkw07-BIdXWpRjAbqTLzJvYz8Z-cjxJ4uUvH-h3-xGMpQ26a_tA8h1AvzM60L2pS338QA0CRVZrH0WTtNNagb2eNJdnYOH6YW7sdDAWE78SroRS8nKZFGyvGAILz7iDyNcf_rXybAhTCN-zjIjv1Hy73dECO0KCgx9j6_hB7Eyhqdm8_RmJZStL9sSyyywNLyUDMMsP35ah42ARdiF2OB3_fQIwrIRS9ICoAtCqRW6sTh4ctzfdv4PPJFsOeuxzl3pEpVPnwj7yR9QZojD5LjiZujK6k8WhVKZRQMPtCJ9HKm_igIDC4qGh0Yqi9qV35MEe8g" \
               --form "file=@\"scanreport.json\""
