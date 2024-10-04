@@ -1,45 +1,42 @@
-name: OWASP ZAP Scanning Workflow
+name: OWASP ZAP Integration with GitHub Actions
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]  # Adjust if you use a different branch as your default
-  pull_request:
-    branches: [ main ]  # Adjust if you use a different branch for PRs
+    branches:
+      - main
 
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
+    name: Scan the web applicationconfigure permissions in Actions settings
     steps:
-      - name: Checkout code
+
+      - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Set full permissions
-        run: sudo chmod -R 777 .
-        
-      - name: Set up Docker Environment
+        with:
+          ref: main
+      
+      - name: Set permissions
         run: |
-          sudo chmod -R 777 ${{ github.workspace }}
-          echo "TARGET_URL=https://risasdental.com/" >> $GITHUB_ENV
-          
+          mkdir /tmp/zap
+          chmod a+w /tmp/zap
+          ls -la /tmp/zap
 
-      - name: OWASP ZAP Scan
-        run: |
-          docker run --rm -v ${{ github.workspace }}:/zap/wrk/:rw -t zaproxy/zap-stable zap-baseline.py \
-            -t http://testphp.vulnweb.com/ \
-            -r scanreport.html \
-            -x scanreport.xml \
-            -J scanreport.json \
-            -I
+      - name: ZAP Scan
+        run: docker run --rm -v $(pwd):/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t https://juice-shop.herokuapp.com/#/ -J report.json -I
+        working-directory: /tmp/zap
 
-      - name: List reports
+      - name: View files
         run: |
-          echo "Listing generated reports..."
-          ls -l ${GITHUB_WORKSPACE}
+          cat report.json
+        working-directory: /tmp/zap
 
-      - name: Upload ZAP Scan Report
+      - name: Push report to CSPM panel
         run: |
-            cd ${GITHUB_WORKSPACE}
-            curl --location --request POST "https://cspm.stage.accuknox.com/api/v1/artifact/?tenant_id=5088&data_type=ZAP&save_to_s3=false" \
-              --header "Tenant-Id: 5088" \
-              --header "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxODg0OTM3OTY5LCJqdGkiOiI0MDc3YWI5MTdlNTQ0NGEwYTFmNmExZTYzYWM5ZGVjYyIsImlzcyI6ImNzcG0uc3RhZ2UuYWNjdWtub3guY29tIn0.RUAFGIfS8NhZ83SZ-Rkw07-BIdXWpRjAbqTLzJvYz8Z-cjxJ4uUvH-h3-xGMpQ26a_tA8h1AvzM60L2pS338QA0CRVZrH0WTtNNagb2eNJdnYOH6YW7sdDAWE78SroRS8nKZFGyvGAILz7iDyNcf_rXybAhTCN-zjIjv1Hy73dECO0KCgx9j6_hB7Eyhqdm8_RmJZStL9sSyyywNLyUDMMsP35ah42ARdiF2OB3_fQIwrIRS9ICoAtCqRW6sTh4ctzfdv4PPJFsOeuxzl3pEpVPnwj7yR9QZojD5LjiZujK6k8WhVKZRQMPtCJ9HKm_igIDC4qGh0Yqi9qV35MEe8g" \
-              --form "file=@\"scanreport.json\""
+          curl --location --request POST 'https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=${{ env.tenant_id }}&data_type=ZAP&label_id=dasttest&save_to_s3=false' --header 'Tenant-Id: ${{ env.tenant_id }}' --header 'Authorization: Bearer ${{ env.token }}' --form 'file=@report.json'
+        env:
+          token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3MzMxMzg4LCJqdGkiOiI5NzE5YTliYjAzN2E0MjkyYTViZDdhOTlkMDA4MGI5MCIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.LLcUDwTTStRonndbPVwvm_xEjktIq2e7oVaxGDyAML7_46VLxTeF5jHJUAlSkjdVGBkgYzuRDCfTEgmCROHCboNfAuJDbgYu03EKPdfhYceNG5THODdZR8rOPRxwLdSTa6HxUaykVsdJdY_-HwPYeh21hZtdjjWjxqrxoxdsg0SgnMQko6w3YVpG9Nt7WUZeBNOXgjU0YVIeaxP53PfYdDyFUq2MRnhg5uNu8N1Gtu8PgH3x48nZTcZK-zTnv4DHLfmodjgam7rp9ta1P6vUcImrrdeHTIYMKRo9LtyyUfm9v88quSw-EnL50DQGkObwf7Oixy8tnZ7ap9toMT4Uog"
+          endpoint: "cspm.demo.accuknox.com"
+          tenant_id: "167"
+        working-directory: /tmp/zap
