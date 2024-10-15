@@ -11,12 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Scan the web applicationconfigure permissions in Actions settings
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: main
-      
+
       - name: Set permissions
         run: |
           mkdir /tmp/zap
@@ -34,9 +33,9 @@ jobs:
 
       - name: Push report to CSPM panel
         run: |
-          curl --location --request POST 'https://cspm.demo.accuknox.com/api/v1/artifact/?tenant_id=${{ env.tenant_id }}&data_type=ZAP&label_id=dasttest&save_to_s3=false' --header 'Tenant-Id: ${{ env.tenant_id }}' --header 'Authorization: Bearer ${{ env.token }}' --form 'file=@report.json'
+          curl --location --request POST 'https://${{ env.endpoint }}/api/v1/artifact/?tenant_id=${{ env.tenant_id }}&data_type=ZAP&label_id=DAST&save_to_s3=false' --header 'Tenant-Id: ${{ env.tenant_id }}' --header 'Authorization: Bearer ${{ env.token }}' --form 'file=@report.json'
         env:
-          token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI3MzMxMzg4LCJqdGkiOiI5NzE5YTliYjAzN2E0MjkyYTViZDdhOTlkMDA4MGI5MCIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.LLcUDwTTStRonndbPVwvm_xEjktIq2e7oVaxGDyAML7_46VLxTeF5jHJUAlSkjdVGBkgYzuRDCfTEgmCROHCboNfAuJDbgYu03EKPdfhYceNG5THODdZR8rOPRxwLdSTa6HxUaykVsdJdY_-HwPYeh21hZtdjjWjxqrxoxdsg0SgnMQko6w3YVpG9Nt7WUZeBNOXgjU0YVIeaxP53PfYdDyFUq2MRnhg5uNu8N1Gtu8PgH3x48nZTcZK-zTnv4DHLfmodjgam7rp9ta1P6vUcImrrdeHTIYMKRo9LtyyUfm9v88quSw-EnL50DQGkObwf7Oixy8tnZ7ap9toMT4Uog"
-          endpoint: "cspm.demo.accuknox.com"
-          tenant_id: "167"
+          token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoyMTY5OTU2NDE0LCJqdGkiOiJkNmM5MTI3N2E5MmE0ZDNkYmJkOTUwNDc5YTlkZWRmYyIsImlzcyI6ImNzcG0uY25hcHAuYWNjdWtub3guY29tIn0.r3qdcs8xDWe-01KIa8BNRohCEC--XfMy6BADOAPAJkzQ1JBF1871BIB0ZQ20GsWv3At9wvRlkCteYL2MM-6BzBV7nZAtsONSXBc5plepk9itCPaGfezjy159Lsc89BeEZkKnqViBXl9iEFEqfiN7W26KTCqHZY3s225zoDVWfaeZdxWUDBk9f2YPNDvoFYukroiriCt9p_bluv2BL10r8N0mp9cBgg28KBVMkH3_5uxl3aa3QUoGMaBLgZ6VUeKBg70Bx1aooS1UuVygE3sCujJo8_WuenUztPKc03RVRD0LtYpWqIVO9SuT2THFHXwrg_FouEAn0xhq4PkrZ8GY3A"
+          endpoint: "cspm.cnapp.accuknox.com"
+          tenant_id: "3"
         working-directory: /tmp/zap
