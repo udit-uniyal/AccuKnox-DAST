@@ -23,7 +23,7 @@ jobs:
           ls -la /tmp/zap
 
       - name: ZAP Scan
-        run: docker run --rm -v $(pwd):/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t https://www.accuknox.com/ -J report.json -I
+        run: docker run --rm -v $(pwd):/zap/wrk -t zaproxy/zap-stable zap-baseline.py -t https://google-gruyere.appspot.com/ -J report.json -I
         working-directory: /tmp/zap
 
       - name: View files
@@ -35,7 +35,7 @@ jobs:
         run: |
           curl --location --request POST 'https://${{ env.endpoint }}/api/v1/artifact/?tenant_id=${{ env.tenant_id }}&data_type=ZAP&label_id=accuknoxdast&save_to_s3=false' --header 'Tenant-Id: ${{ env.tenant_id }}' --header 'Authorization: Bearer ${{ env.token }}' --form 'file=@report.json'
         env:
-          token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoyMTcyMDI3ODMyLCJqdGkiOiIwNTM1ZDUwMTBmOGI0MjBkOTAwMDM2YWFlZjYxNTc1NyIsImlzcyI6ImNzcG0uY25hcHAuYWNjdWtub3guY29tIn0.FkmhMocxyRsYkpb80aMrLS9N-mGKENu796zUlCtWGNamZcfVL9NG-o66OLqard7GYxgMPPJeDnC9FQlrY7x5QxP_MwvJaeeaJbWExN1HxcRwu1nmoZ7ENkXKq7mAPGPFQHL2AP3BesQWlNcRPc8R7FXJw6-pD87fX38n9xt8G_zX9g0BkiD0Iepc9_lPNAE-y1oeLmOkNHYmosD__o1FF5gIIn_MsJsmpmkdtOeHFw1GRybUM-v5zjzTcr53EA6sGavXgkf3s2oI71XGLzvCnL7BIpW7G1aL39j1OuTx2J5OfoNxknIEFkcDSJpZoE5Ueh7qAG5ZqsOzFCMOZils8g"
-          endpoint: "cspm.cnapp.accuknox.com"
-          tenant_id: "2"
+          token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoyMjAyNTQ1MTc4LCJqdGkiOiI5NDZkZmM1ODNkNTE0NGZmYWZjNmFjMzhmZTQwM2E3MSIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Id_berqmbHZPB7pB5k9PdYq4GpOZTNILvMfcARrt2k1i2b107q5u8V3ROkRSFOx4Sjnok734wuwJ-4_5_l8C-1e85RkW-xFpzzTF5o6kv8CcSSRSvI6XYafAy9CxvGF32yNZoTmiNF8Psz8iHZdNitAXEFZgL4ZYLqjNxJHAXNA8xHk1kYYsn0jHD3MsvMbI-VALSHHcM1ASPKHwmn8r-xEA2Y7lwul1QYW4QdvnTIaYAplxpUZD30dYX9WY0nIK7A17b69_xoHldpr-Dy5OaBGBg9gmDA9KCjOZD8nbltsSxBwDzHhLnRejUHgef6kdGsyvzuhk5Q_pwz5iakN7VA"
+          endpoint: "cspm.demo.accuknox.com"
+          tenant_id: "167"
         working-directory: /tmp/zap
