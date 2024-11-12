@@ -30,30 +30,30 @@ runs:
   steps:
     - name: Set permissions for ZAP output directory
       run: |
-        mkdir /tmp/zap
+        mkdir -p /tmp/zap
         chmod a+w /tmp/zap
         ls -la /tmp/zap
       shell: bash
 
     - name: Run ZAP Scan
       run: |
+        # Select the scan command based on user input
         if [ "${{ inputs.scan_type }}" == "baseline" ]; then
-          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /tmp/zap/report.json -I"
+          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/report.json -I"
         else
-          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /tmp/zap/report.json -I"
+          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/report.json -I"
         fi
 
+        # Run ZAP Docker container with updated volume mapping
         docker run --rm \
           -v /tmp/zap:/zap/wrk \
           -t zaproxy/zap-stable $SCAN_COMMAND
       shell: bash
-      working-directory: /tmp/zap
 
     - name: View ZAP Report
       run: |
         cat /tmp/zap/report.json
       shell: bash
-      working-directory: /tmp/zap
 
     - name: Check Severity Level in ZAP Report
       run: |
@@ -68,7 +68,6 @@ runs:
           echo "No vulnerabilities with severity $SEVERITY_THRESHOLD or higher were found."
         fi
       shell: bash
-      working-directory: /tmp/zap
 
     - name: Upload ZAP Report to AccuKnox CSPM Panel
       run: |
@@ -83,4 +82,3 @@ runs:
           exit 1
         fi
       shell: bash
-      working-directory: /tmp/zap
