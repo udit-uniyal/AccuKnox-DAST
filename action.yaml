@@ -31,14 +31,16 @@ runs:
     - name: Run ZAP Scan
       run: |
         mkdir -p zap_output  # Create an output directory with correct permissions
+
         if [ "${{ inputs.scan_type }}" == "baseline" ]; then
-          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/output/zap-report.json -I"
+          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/output/zap-report.json -I -y /zap/wrk/output/zap.yaml"
         else
           SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/output/zap-report.json -I"
         fi
 
         docker run --rm \
           -v $PWD/zap_output:/zap/wrk/output \
+          -v $PWD/zap_output:/home/zap \
           --user $(id -u):$(id -g) \
           -t zaproxy/zap-stable $SCAN_COMMAND
       shell: bash
