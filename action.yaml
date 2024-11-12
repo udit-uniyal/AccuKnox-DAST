@@ -30,14 +30,16 @@ runs:
   steps:
     - name: Run ZAP Scan
       run: |
+        mkdir -p zap_output  # Create an output directory with correct permissions
         if [ "${{ inputs.scan_type }}" == "baseline" ]; then
-          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/zap-report.json -I"
+          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/output/zap-report.json -I"
         else
-          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/zap-report.json -I"
+          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/output/zap-report.json -I"
         fi
 
         docker run --rm \
-          -v $PWD:/zap/wrk \
+          -v $PWD/zap_output:/zap/wrk/output \
+          --user $(id -u):$(id -g) \
           -t zaproxy/zap-stable $SCAN_COMMAND
       shell: bash
 
@@ -47,7 +49,7 @@ runs:
         
         # Parse the report to check for the specified severity
         if jq -e --arg severity "$SEVERITY_THRESHOLD" \
-             '.site[].alerts[] | select(.risk == $severity)' zap-report.json > /dev/null; then
+             '.site[].alerts[] | select(.risk == $severity)' zap_output/zap-report.json > /dev/null; then
           echo "Error: Vulnerability with severity $SEVERITY_THRESHOLD or higher found in ZAP report."
           exit 1
         else
@@ -60,7 +62,7 @@ runs:
         response=$(curl --location --request POST "https://${{ inputs.accuknox_endpoint }}/api/v1/artifact/?tenant_id=${{ inputs.tenant_id }}&data_type=ZAP&label_id=${{ inputs.label }}&save_to_s3=false" \
           --header "Tenant-Id: ${{ inputs.tenant_id }}" \
           --header "Authorization: Bearer ${{ inputs.accuknox_token }}" \
-          --form "file=@zap-report.json")
+          --form "file=@zap_output/zap-report.json")
 
         echo "Response: $response"
         if [[ "$response" != *"File received successfully"* ]]; then
