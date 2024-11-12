@@ -18,7 +18,7 @@ inputs:
     description: "Label created in AccuKnox SaaS for associating the scan results."
     required: true
   severity_threshold:
-    description: "The minimum severity level (e.g., High) that will cause the pipeline to fail if present in the report."
+    description: "The minimum severity level (e.g., High, Medium, Low, Informational) that will cause the pipeline to fail if present in the report."
     required: true
   scan_type:
     description: "Type of ZAP scan to run: 'baseline' or 'full-scan'."
@@ -37,14 +37,12 @@ runs:
 
     - name: Run ZAP Scan
       run: |
-        # Select the scan command based on user input
         if [ "${{ inputs.scan_type }}" == "baseline" ]; then
           SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J report.json -I"
         else
           SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J report.json -I"
         fi
 
-        # Run ZAP Docker container with updated volume mapping
         docker run --rm \
           -v /tmp/zap:/zap/wrk \
           -t zaproxy/zap-stable $SCAN_COMMAND
@@ -57,15 +55,22 @@ runs:
 
     - name: Check Severity Level in ZAP Report
       run: |
-        SEVERITY_THRESHOLD=${{ inputs.severity_threshold }}
-        
-        # Parse the report to check for the specified severity
-        if jq -e --arg severity "$SEVERITY_THRESHOLD" \
-             '.site[].alerts[] | select(.risk == $severity)' /tmp/zap/report.json > /dev/null; then
-          echo "Error: Vulnerability with severity $SEVERITY_THRESHOLD or higher found in ZAP report."
+        # Map severity threshold to risk code (0=Informational, 1=Low, 2=Medium, 3=High)
+        case "${{ inputs.severity_threshold }}" in
+          High)           RISK_CODE=3 ;;
+          Medium)         RISK_CODE=2 ;;
+          Low)            RISK_CODE=1 ;;
+          Informational)  RISK_CODE=0 ;;
+          *)              echo "Invalid severity threshold"; exit 1 ;;
+        esac
+
+        # Check if any alerts in the report meet or exceed the threshold risk code
+        if jq -e --argjson risk_code "$RISK_CODE" \
+             '.site[].alerts[] | select(.riskcode|tonumber >= $risk_code)' /tmp/zap/report.json > /dev/null; then
+          echo "Error: Vulnerability with severity ${{ inputs.severity_threshold }} or higher found in ZAP report."
           exit 1
         else
-          echo "No vulnerabilities with severity $SEVERITY_THRESHOLD or higher were found."
+          echo "No vulnerabilities with severity ${{ inputs.severity_threshold }} or higher were found."
         fi
       shell: bash
 
