@@ -39,9 +39,9 @@ runs:
       run: |
         # Select the scan command based on user input
         if [ "${{ inputs.scan_type }}" == "baseline" ]; then
-          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/report.json -I"
+          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J report.json -I"
         else
-          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/report.json -I"
+          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J report.json -I"
         fi
 
         # Run ZAP Docker container with updated volume mapping
