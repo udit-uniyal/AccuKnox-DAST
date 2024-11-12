@@ -1,5 +1,5 @@
 name: AccuKnox ZAP DAST Scan
-description: Run a full ZAP scan and upload the reports to the AccuKnox CSPM panel.
+description: Run a ZAP scan (full or baseline) and upload the reports to the AccuKnox CSPM panel.
 
 inputs:
   target_url:
@@ -20,18 +20,25 @@ inputs:
   severity_threshold:
     description: "The minimum severity level (e.g., High) that will cause the pipeline to fail if present in the report."
     required: true
+  scan_type:
+    description: "Type of ZAP scan to run: 'baseline' or 'full-scan'."
+    required: true
+    default: "full-scan"
 
 runs:
   using: "composite"
   steps:
-    - name: ZAP Full Scan
+    - name: Run ZAP Scan
       run: |
+        if [ "${{ inputs.scan_type }}" == "baseline" ]; then
+          SCAN_COMMAND="zap-baseline.py -t ${{ inputs.target_url }} -J /zap/wrk/zap-report.json -I"
+        else
+          SCAN_COMMAND="zap-full-scan.py -t ${{ inputs.target_url }} -J /zap/wrk/zap-report.json -I"
+        fi
+
         docker run --rm \
           -v $PWD:/zap/wrk \
-          -t zaproxy/zap-stable zap-full-scan.py \
-          -t ${{ inputs.target_url }} \
-          -J /zap/wrk/zap-report.json \
-          -I
+          -t zaproxy/zap-stable $SCAN_COMMAND
       shell: bash
 
     - name: Check Severity Level in ZAP Report
