@@ -23,7 +23,7 @@ jobs:
           accuknox_endpoint: "cspm.demo.accuknox.com"  # Replace with your AccuKnox CSPM endpoint
           tenant_id: "167"  # Replace with your AccuKnox tenant ID
           label: "dast"  # Replace with the label you want to associate with this scan
-          severity_threshold: "High"  # Define the minimum severity that will cause the pipeline to fail
+          severity_threshold: "Low"  # Define the minimum severity that will cause the pipeline to fail
           scan_type: "baseline"
 
 
