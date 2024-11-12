@@ -53,6 +53,21 @@ runs:
         cat /tmp/zap/report.json
       shell: bash
 
+
+    - name: Upload ZAP Report to AccuKnox CSPM Panel
+      run: |
+        response=$(curl --location --request POST "https://${{ inputs.accuknox_endpoint }}/api/v1/artifact/?tenant_id=${{ inputs.tenant_id }}&data_type=ZAP&label_id=${{ inputs.label }}&save_to_s3=false" \
+          --header "Tenant-Id: ${{ inputs.tenant_id }}" \
+          --header "Authorization: Bearer ${{ inputs.accuknox_token }}" \
+          --form "file=@/tmp/zap/report.json")
+
+        echo "Response: $response"
+        if [[ "$response" != *"File received successfully"* ]]; then
+          echo "Error: Failed to push report to CSPM panel"
+          exit 1
+        fi
+      shell: bash
+
     - name: Check Severity Level in ZAP Report
       run: |
         # Map severity threshold to risk code (0=Informational, 1=Low, 2=Medium, 3=High)
@@ -71,19 +86,5 @@ runs:
           exit 1
         else
           echo "No vulnerabilities with severity ${{ inputs.severity_threshold }} or higher were found."
-        fi
-      shell: bash
-
-    - name: Upload ZAP Report to AccuKnox CSPM Panel
-      run: |
-        response=$(curl --location --request POST "https://${{ inputs.accuknox_endpoint }}/api/v1/artifact/?tenant_id=${{ inputs.tenant_id }}&data_type=ZAP&label_id=${{ inputs.label }}&save_to_s3=false" \
-          --header "Tenant-Id: ${{ inputs.tenant_id }}" \
-          --header "Authorization: Bearer ${{ inputs.accuknox_token }}" \
-          --form "file=@/tmp/zap/report.json")
-
-        echo "Response: $response"
-        if [[ "$response" != *"File received successfully"* ]]; then
-          echo "Error: Failed to push report to CSPM panel"
-          exit 1
         fi
       shell: bash
