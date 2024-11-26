@@ -16,14 +16,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run AccuKnox ZAP DAST Scan
-        uses: ./  # Replace with your action's path or repository if using it as a reusable action
+        uses: udit-uniyal/AccuKnox-DAST-Scan@1.0.0
         with:
-          target_url: "http://www.vulnweb.com/"  # Replace with the target URL for the ZAP scan
-          accuknox_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoyMjAyNTQ1MTc4LCJqdGkiOiI5NDZkZmM1ODNkNTE0NGZmYWZjNmFjMzhmZTQwM2E3MSIsImlzcyI6ImNzcG0uZGVtby5hY2N1a25veC5jb20ifQ.Id_berqmbHZPB7pB5k9PdYq4GpOZTNILvMfcARrt2k1i2b107q5u8V3ROkRSFOx4Sjnok734wuwJ-4_5_l8C-1e85RkW-xFpzzTF5o6kv8CcSSRSvI6XYafAy9CxvGF32yNZoTmiNF8Psz8iHZdNitAXEFZgL4ZYLqjNxJHAXNA8xHk1kYYsn0jHD3MsvMbI-VALSHHcM1ASPKHwmn8r-xEA2Y7lwul1QYW4QdvnTIaYAplxpUZD30dYX9WY0nIK7A17b69_xoHldpr-Dy5OaBGBg9gmDA9KCjOZD8nbltsSxBwDzHhLnRejUHgef6kdGsyvzuhk5Q_pwz5iakN7VA"
-          accuknox_endpoint: "cspm.demo.accuknox.com"  # Replace with your AccuKnox CSPM endpoint
-          tenant_id: "167"  # Replace with your AccuKnox tenant ID
-          label: "dast"  # Replace with the label you want to associate with this scan
-          severity_threshold: "Low"  # Define the minimum severity that will cause the pipeline to fail
+          target_url: "http://www.vulnweb.com/"  
+          accuknox_token: "${{ secrets.ACCUKNOX_TOKEN }}"
+          accuknox_endpoint: "cspm.demo.accuknox.com"  
+          tenant_id: "${{ secrets.TENANT_ID }}"  
+          label: "dast"  
+          severity_threshold: "Low" 
           scan_type: "baseline"
 
 
