@@ -5,7 +5,7 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: DAST@0
+- task: AccuKnox-DAST@0
   inputs:
     targetURL: $(targetURL)
     accuknoxEndpoint: $(accuknoxEndpoint)
