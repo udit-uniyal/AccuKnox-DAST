@@ -1,0 +1,16 @@
+trigger: 
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: DAST@0
+  inputs:
+    targetURL: $(targetURL)
+    accuknoxEndpoint: $(accuknoxEndpoint)
+    accuknoxTenantId: $(accuknoxTenantId)
+    accuknoxToken: $(accuknoxToken)
+    accuknoxLabel: $(accuknoxLabel)
+    scanType: $(scanType)
+    qualityGate: $(qualityGate)
