@@ -22,7 +22,7 @@ jobs:
           accuknox_token: "${{ secrets.ACCUKNOX_TOKEN }}"
           accuknox_endpoint: "cspm.demo.accuknox.com"  
           tenant_id: "${{ secrets.TENANT_ID }}"  
-          label: "dast"  
+          label: "lxt"  
           severity_threshold: "Low" 
           scan_type: "baseline"
 
