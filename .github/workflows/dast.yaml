@@ -18,7 +18,7 @@ jobs:
       - name: Run AccuKnox ZAP DAST Scan
         uses: udit-uniyal/AccuKnox-DAST-Scan@1.0.0
         with:
-          target_url: "http://www.vulnweb.com/"  
+          target_url: "https://lxt.ai"  
           accuknox_token: "${{ secrets.ACCUKNOX_TOKEN }}"
           accuknox_endpoint: "cspm.demo.accuknox.com"  
           tenant_id: "${{ secrets.TENANT_ID }}"  
