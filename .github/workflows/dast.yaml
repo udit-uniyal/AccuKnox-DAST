@@ -15,8 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Run AccuKnox ZAP DAST Scan
-        uses: udit-uniyal/AccuKnox-DAST-Scan@1.0.0
+      - name: AccuKnox DAST
+        uses: accuknox/dast-scan-action@v1.0.0
         with:
           target_url: "https://lxt.ai"  
           accuknox_token: "${{ secrets.ACCUKNOX_TOKEN }}"
