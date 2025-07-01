@@ -18,11 +18,11 @@ jobs:
       - name: AccuKnox DAST
         uses: accuknox/dast-scan-action@v1.0.0
         with:
-          target_url: "https://lxt.ai"  
+          target_url: "http://testphp.vulnweb.com/login.php"  
           accuknox_token: "${{ secrets.ACCUKNOX_TOKEN }}"
           accuknox_endpoint: "cspm.demo.accuknox.com"  
           tenant_id: "${{ secrets.TENANT_ID }}"  
-          label: "lxt"  
+          label: "vulnweb"  
           severity_threshold: "Low" 
           scan_type: "baseline"
 
